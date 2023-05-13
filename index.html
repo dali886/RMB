@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<!-- saved from url=(0026)https://www.kw360.net/rmb/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>人民币转大写金额在线转换-RMB人民币数字金额大小写转换器</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+<link rel="stylesheet" type="text/css" href="./sucai/css.css">
+<script src="./sucai/hm.js"></script><script type="text/javascript" src="./sucai/jquery-1.11.1.js"></script>
+<script type="text/javascript" src="./sucai/public.js"></script>
+<script>
+function convertCurrency(currencyDigits) {
+    // Constants: 
+    var MAXIMUM_NUMBER = 99999999999.99;
+    // Predefine the radix characters and currency symbols for output: 
+    var CN_ZERO = "零";
+    var CN_ONE = "壹";
+    var CN_TWO = "贰";
+    var CN_THREE = "叁";
+    var CN_FOUR = "肆";
+    var CN_FIVE = "伍";
+    var CN_SIX = "陆";
+    var CN_SEVEN = "柒";
+    var CN_EIGHT = "捌";
+    var CN_NINE = "玖";
+    var CN_TEN = "拾";
+    var CN_HUNDRED = "佰";
+    var CN_THOUSAND = "仟";
+    var CN_TEN_THOUSAND = "万";
+    var CN_HUNDRED_MILLION = "亿";
+    var CN_SYMBOL = "人民币";
+    var CN_DOLLAR = "元";
+    var CN_TEN_CENT = "角";
+    var CN_CENT = "分";
+    var CN_INTEGER = "整";
+
+    // Variables: 
+    var integral;    // Represent integral part of digit number. 
+    var decimal;    // Represent decimal part of digit number. 
+    var outputCharacters;    // The output result. 
+    var parts;
+    var digits, radices, bigRadices, decimals;
+    var zeroCount;
+    var i, p, d;
+    var quotient, modulus;
+
+    // Validate input string: 
+    currencyDigits = currencyDigits.toString();
+    $("#codeall").css("display", "none");
+    if (currencyDigits == "") {
+        $("#codeall").css("display", "block");
+        document.getElementById('errdiv').innerHTML = "请输入小写金额！";
+        return "";
+    }
+    if (currencyDigits.match(/[^,.\d]/) != null) {
+
+        $("#codeall").css("display", "block");
+        document.getElementById('errdiv').innerHTML = "小写金额含有无效字符！";
+        return "";
+    }
+    if ((currencyDigits).match(/^((\d{1,3}(,\d{3})*(.((\d{3},)*\d{1,3}))?)|(\d+(.\d+)?))$/) == null) {
+        $("#codeall").css("display", "block");
+        document.getElementById('errdiv').innerHTML = "小写金额的格式不正确！";
+        return "";
+    }
+
+    // Normalize the format of input digits: 
+    currencyDigits = currencyDigits.replace(/,/g, "");    // Remove comma delimiters. 
+    currencyDigits = currencyDigits.replace(/^0+/, "");    // Trim zeros at the beginning. 
+    // Assert the number is not greater than the maximum number. 
+    if (Number(currencyDigits) > MAXIMUM_NUMBER) {
+        $("#codeall").css("display", "block");
+        document.getElementById('errdiv').innerHTML = "金额过大，应小于1000亿元！";
+        return "";
+    }
+
+    // Process the coversion from currency digits to characters: 
+    // Separate integral and decimal parts before processing coversion: 
+    parts = currencyDigits.split(".");
+    if (parts.length > 1) {
+        integral = parts[0];
+        decimal = parts[1];
+        // Cut down redundant decimal digits that are after the second. 
+        decimal = decimal.substr(0, 2);
+    }
+    else {
+        integral = parts[0];
+        decimal = "";
+    }
+    // Prepare the characters corresponding to the digits: 
+    digits = new Array(CN_ZERO, CN_ONE, CN_TWO, CN_THREE, CN_FOUR, CN_FIVE, CN_SIX, CN_SEVEN, CN_EIGHT, CN_NINE);
+    radices = new Array("", CN_TEN, CN_HUNDRED, CN_THOUSAND);
+    bigRadices = new Array("", CN_TEN_THOUSAND, CN_HUNDRED_MILLION);
+    decimals = new Array(CN_TEN_CENT, CN_CENT);
+    // Start processing: 
+    outputCharacters = "";
+    // Process integral part if it is larger than 0: 
+    if (Number(integral) > 0) {
+        zeroCount = 0;
+        for (i = 0; i < integral.length; i++) {
+            p = integral.length - i - 1;
+            d = integral.substr(i, 1);
+            quotient = p / 4;
+            modulus = p % 4;
+            if (d == "0") {
+                zeroCount++;
+            }
+            else {
+                if (zeroCount > 0) {
+                    outputCharacters += digits[0];
+                }
+                zeroCount = 0;
+                outputCharacters += digits[Number(d)] + radices[modulus];
+            }
+            if (modulus == 0 && zeroCount < 4) {
+                outputCharacters += bigRadices[quotient];
+                zeroCount = 0;
+            }
+        }
+        outputCharacters += CN_DOLLAR;
+    }
+    // Process decimal part if there is: 
+    if (decimal != "") {
+        for (i = 0; i < decimal.length; i++) {
+            d = decimal.substr(i, 1);
+            if (d != "0") {
+                outputCharacters += digits[Number(d)] + decimals[i];
+            }
+        }
+    }
+    // Confirm and return the final output string: 
+    if (outputCharacters == "") {
+        outputCharacters = CN_ZERO + CN_DOLLAR;
+    }
+    if (decimal == "") {
+        outputCharacters += CN_INTEGER;
+    }
+    outputCharacters = outputCharacters;
+    return outputCharacters;
+} 
+
+function Empty(){
+	$("#inputstr").val('');
+	$("#outputstr").val('');
+	$("#codeall").hide();
+}
+</script>
+<style>
+.rmb_left {width:150px;display:inline-block;}
+#codeall {color: #ff9941;font-size: 16px;padding-left: 150px;}
+.rmbbox {border: 1px solid #e1e1e1;background-color: #ffffff;padding: 20px;border-radius: 6px;}
+input.json_input { padding: 2px 5px; font-size:16px; }
+h2{ text-align:left; font-size:16px;text-indent:10px; line-height:40px; font-weight:bold;border:1px solid #ecede8;border-left: 0; border-right: 0;}
+ul.daxielist{padding:20px 0;padding-bottom:0;width:100%;overflow:hidden}
+ul.daxielist li{ float:left; width:20%; font-size:18px;padding-bottom:10px;text-align: center;}
+
+.Instructions,.Instructionst{padding:10px;border-top:0;text-align:left;font-size:14px;line-height:24px}
+.Instructionst{ padding-top:0}
+ul.zhuanhuan{ background:#F6F6F6;width:780px;border:1px solid #CCC;border-bottom:0;border-top:0;overflow:hidden;padding:10px 0}
+ul.zhuanhuan li{padding:10px;text-align:left;width:760px;overflow:hidden}
+ul.zhuanhuan li h3{ float:left;line-height:40px;height:40px;width:210px;text-align:right;font-size:18px}
+ul.zhuanhuan li .li{ float:left; height:40px; padding-left:5px; text-align:left; padding-top:3px}
+ul.zhuanhuan li .li input.shuru ,ul.zhuanhuan li .li input.xianshi{float:left;width:280px;background:#FFF;border:1px solid #333;height:40px;line-height:40px;padding:0 10px;text-align:left;font-size:20px}
+ul.zhuanhuan li .li input.xianshi{width:420px; font-family:"SimHei";font-size:18px}
+ul.zhuanhuan li .li .bto-box{float:left;padding-left:15px}
+
+ul.zhuanhuan li .li .bottom{float:left;background:url(bottoms.gif) no-repeat 0 -40px;border:0;width:124px;height:40px;overflow:hidden;text-indent:-9999px}
+ul.zhuanhuan li .li .bottom:hover{cursor:pointer;background-position:0 0}
+
+#footer{ height:auto; padding:10px 0; border-top:2px solid #2E73D6}#footer a{color:#F00}
+.w110{padding-left:20px;line-height:24px;background:url(w110.png) no-repeat 0 center}
+@media screen and (max-width:481px){
+	.json_input {
+		margin-bottom: 15px;
+	}
+	.rmbbox {padding:10px 20px 0px;}
+}
+</style>
+</head>
+<body>
+<div class="inner">
+	<div class="inner-box">
+		<div class="inner-logo">
+			<a href="#" title="计算器在线">人民币转换大写</a>
+			<h3>转换工具</h3>
+		</div>
+	</div>
+</div>
+<div class="container">
+<h1></h1>
+<div class="main">
+<ol id="manual" class="manual">
+	<li>人民币数字金额大小写转换器(将人民币阿拉伯数字转换成中文大写、人民币大写转换工具)。</li>
+</ol></div>
+<div class="main">
+	<div class="rmbbox">
+	<p>
+	<span class="rmb_left">输入小写数字金额：</span><input id="inputstr" name="inputstr" class="json_input" placeholder="输入小写数字金额">
+	<button type="button" class="btn btn-primary btnchk" onclick="outputstr.value = convertCurrency(inputstr.value);">转换为大写金额</button>
+	<button type="button" class="btn btn-danger" onclick="Empty();">清空结果</button></p>
+	<p>
+	<span class="rmb_left">显示中文大写金额：</span><input id="outputstr" name="outputstr" class="json_input" style="width:80%;letter-spacing: 1px;" placeholder="转换后的大写金额">
+	</p>
+	<div class="alert alert-success alert-dismissible text-center" id="codeall" role="alert" style="display: none;color:">
+		<span id="errdiv"></span>
+	</div>
+	</div>
+	
+	<div class="clear"></div>
+	
+	<script>advertContentTop();</script>
+  <p><strong>人民币转大写</strong>：人民币数字金额转大写广泛应用于银行、支票、发票、财务等各方面，从明代朱元璋开始，主要是因为大写数字涂改起来困难，可以防止作弊。使用至今也是为了财务安全。</p>
+	
+	<h2>阿拉伯金额数字对应中文大写表 - 数字转大写金额 (以下<span class="red">红色字</span>可选中复制)</h2>
+    <ul class="daxielist">
+    	<li><img src="./sucai/0.jpg" alt="0 大写 零" title="0 的大写为 零"><br>0 = <b class="red">零</b></li>
+    	<li><img src="./sucai/1.jpg" alt="1 大写 壹" title="1 的大写为 壹"><br>1 = <b class="red">壹</b></li>
+        <li><img src="./sucai/2.jpg" alt="2 大写 贰" title="2 的大写为 贰"><br>2 = <b class="red">贰</b></li>
+        <li><img src="./sucai/3.jpg" alt="3 大写 叁" title="3 的大写为 叁"><br>3 = <b class="red">叁</b></li>
+        <li><img src="./sucai/4.jpg" alt="4 大写 肆" title="4 的大写为 肆"><br>4 = <b class="red">肆</b></li>
+        
+        <li><img src="./sucai/5.jpg" alt="5 大写 伍" title="5 的大写为 伍"><br>5 = <b class="red">伍</b></li>
+        <li><img src="./sucai/6.jpg" alt="6 大写 陆" title="6 的大写为 陆"><br>6 = <b class="red">陆</b></li>
+        <li><img src="./sucai/7.jpg" alt="7 大写 柒" title="7 的大写为 柒"><br>7 = <b class="red">柒</b></li>
+        <li><img src="./sucai/8.jpg" alt="8 大写 捌" title="8 的大写为 捌"><br>8 = <b class="red">捌</b></li>
+        <li><img src="./sucai/9.jpg" alt="9 大写 玖" title="9 的大写为 玖"><br>9 = <b class="red">玖</b></li>
+    </ul>
+    <div class="Instructions"><strong>数字金额大小写转换</strong><br>中文大写金额数字前应标明“人民币”字样，大写金额数字应紧接“人民币”字样填写，不得留有空白。<br>阿拉伯数字小写金额数字中有“0”时，中文大写应按照汉语语言规律、金额数字构成和防止涂改的要求进行书写。<br>例如：￥206000.75应写成 人民币贰拾万陆仟元零柒角伍分，或写成 人民币贰拾万零陆仟元柒角伍分。</div>
+    <h2>金额单位(位数)对应表</h2>
+    <ul class="daxielist">
+    	<li><img src="./sucai/yi.jpg" alt="亿" title="亿"><br>亿 = <b class="red">亿</b></li>
+        <li><img src="./sucai/wan.jpg" alt="万" title="万"><br>万 = <b class="red">万</b></li>
+        <li><img src="./sucai/qian.jpg" alt="仟" title="仟"><br>千 = <b class="red">仟</b></li>
+        <li><img src="./sucai/bai.jpg" alt="佰" title="佰"><br>百 = <b class="red">佰</b></li>
+    	<li><img src="./sucai/10.jpg" alt="拾" title="拾"><br>十 = <b class="red">拾</b></li>
+        <li><img src="./sucai/yuan.jpg" alt="元" title="元"><br>元 = <b class="red">元(圆)</b></li>
+        <li><img src="./sucai/jiao.jpg" alt="角" title="角"><br>角 = <b class="red">角</b></li>
+        <li><img src="./sucai/fen.jpg" alt="分" title="分"><br>分 = <b class="red">分</b></li>
+        <li><img src="./sucai/zheng1.jpg" alt="正" title="正"><br>正 = <b class="red">正</b></li>
+        <li><img src="./sucai/zheng2.jpg" alt="整" title="整"><br>整 = <b class="red">整</b></li>
+    </ul>
+    <div class="Instructions"><strong>人民币大小写转换说明</strong><br>中文大写金额数字到“元”为止的，在“元”之后、应写“整”(或“正”)字；在“角”之后，可以不写“整”(或“正”)字；大写金额数字有“分”的，“分”后面不写“整”(或“正”)字。</div>
+	
+</div>
+</div>
+	<a href="javascript:;" class="close-subNav" onclick="hideOtherTools()">x</a>	
+</div>
+	</div>
+	<style>
+	.subnav-type a {width: 10%;}
+	#hanldeOtherTools {margin:15px auto 0;display: block;text-decoration: none;border: 1px solid #4162ea;width: 160px;text-align: center;padding: 4px 0;border-radius: 5px;color: #4162ea;}
+	#hanldeOtherTools:hover {background:#4162ea;color:#ffffff;}
+	@media screen and (max-width: 481px) { 
+		.othertoolstitle {width: 28%;height:auto;}
+		#hanldeOtherTools {border: 1px solid #666666;color:#666666;width:90%;background:#ffffff;margin:auto;}
+	}
+	</style>
+	<script>
+	var tab = document.getElementsByClassName('othertoolstitle')[0].getElementsByTagName('li');
+	var tabBox = document.getElementsByName('subnavdiv');
+	tabBox[0].style.display = 'block';
+	for(var i=0; i< tab.length; i++) {
+		tab[i].index = i;
+		tab[i].onmouseover = function(){
+			for(var i=0; i< tab.length; i++) {
+tab[i].className = '';
+tabBox[i].style.display = 'none';
+			}
+			this.className = 'active';
+			tabBox[this.index].style.display = 'block';
+		}
+	}
+	function showOtherTools() {
+		document.getElementById('hanldeOtherTools').style.display = 'none';
+		document.getElementById('otherTools').style.display = 'block';
+		var x = document.getElementsByName('subnavdiv');
+		x[0].style.display = 'block';
+		var dateTime = new Date();
+		dateTime = dateTime.setDate(dateTime.getDate()+7);
+		dateTime = new Date(dateTime)
+		document.cookie = 'showTools=1;expires=' + dateTime + '';
+	}
+	function hideOtherTools() {
+		if(isMobile()){;
+			document.getElementById('hanldeOtherTools').style.display = 'block';
+			document.getElementById('otherTools').style.display = 'none';
+			document.cookie = 'showTools=0;'
+		};
+	}
+	if(!isMobile()){
+		showOtherTools();
+	}
+	</script>
+
+</div>
+
+</div>
+
+
+</body></html>
